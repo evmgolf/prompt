@@ -2,12 +2,20 @@
 pragma solidity 0.8.13;
 
 import {Script} from "forge-std/Script.sol";
-import {Reader} from "./Reader.sol";
+import {Filesystem} from "./Filesystem.sol";
 
 contract EchoLine is Script {
   event echo(string);
+  bytes filename = "input";
+  Filesystem fs;
 
-  function run() external {
-    emit echo(string((new Reader()).readline()));
+  constructor () {
+    fs = new Filesystem();
+  }
+
+  function run() external returns (string memory text) {
+    text = string(fs.readLine(filename));
+    emit echo(text);
+    return text;
   }
 }
