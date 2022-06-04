@@ -11,16 +11,11 @@ contract Filesystem is Test {
   using Hexadecimal for address;
   using Hexadecimal for uint;
 
-  bytes public filenamePrefix = "/tmp";
   uint files;
   Bash bash;
 
   constructor () {
     bash = new Bash();
-  }
-
-  function setFilenamePrefix(bytes memory prefix) public {
-    filenamePrefix = prefix;
   }
 
   function exists(bytes memory filename) public returns (bool) {
@@ -37,13 +32,20 @@ contract Filesystem is Test {
     );
   }
 
-  function write(bytes memory text) public returns (bytes memory filename) {
-    filename = bytes.concat(filenamePrefix, "/", uint(keccak256(text)).hexadecimal());
+  function remove(bytes memory filename) public {
+    bash.run(bytes.concat("rm ", filename), "");
+  }
+
+  function createPipe(bytes memory filename) public {
+    bash.run(bytes.concat("mkfifo ", filename), "");
+  }
+
+  function write(bytes memory filename, bytes memory text) public {
     bash.run(bytes.concat("echo ", text), filename);
   }
 
-  function write(address a) public returns (bytes memory) {
-    return write(a.hexadecimal());
+  function write(bytes memory filename, address a) public {
+    return write(filename, a.hexadecimal());
   }
 
   function readHexadecimal(bytes memory filename) public returns (bytes memory){
