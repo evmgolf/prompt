@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-export INPUT_FILE=/tmp/forge-$1-input
-export OUTPUT_FILE=/tmp/forge-$1-output
+export INPUT_FILE=$(mktemp)
+export OUTPUT_FILE=$(mktemp)
 
 if [[ -e $INPUT_FILE ]]; then
   rm $INPUT_FILE
