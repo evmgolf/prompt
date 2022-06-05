@@ -16,6 +16,7 @@ abstract contract IO is Script {
     bytes memory inputFile = bytes(vm.envString("INPUT_FILE"));
     bytes memory outputFile = bytes(vm.envString("OUTPUT_FILE"));
 
+    fs.write(outputFile, "");
     while (running) {
       bytes memory input = fs.readLine(inputFile);
       bytes memory output = handleInput(input);
