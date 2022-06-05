@@ -13,7 +13,13 @@ if [[ -e $OUTPUT_FILE ]]; then
 fi
 mkfifo $OUTPUT_FILE 
 
-exec 3>$OUTPUT_FILE
-trap "exec 3>&-" SIGINT SIGTERM 
-export OUTPUT_FILE="&3"
-forge script --ffi EchoAll -vvv
+trap 'kill 0' EXIT
+coproc forge script --ffi EchoAll
+
+echo -n "> "
+while IFS='$\n' read -r LINE; do
+  echo "$LINE" >$INPUT_FILE
+  read IN <$OUTPUT_FILE
+  echo $IN
+  echo -n "> "
+done
