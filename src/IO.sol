@@ -21,7 +21,6 @@ abstract contract IO is Script {
       bytes memory output = handleInput(input);
       fs.write(outputFile, output);
     }
-    fs.remove(inputFile);
   }
 
   function handleInput(bytes memory input) internal virtual returns (bytes memory);
