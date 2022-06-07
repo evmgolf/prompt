@@ -41,7 +41,7 @@ contract Filesystem is Test {
   }
 
   function write(bytes memory filename, bytes memory text) public {
-    bash.run(bytes.concat("echo ", text), filename);
+    bash.run(bytes.concat("echo -e ", text), filename);
   }
 
   function write(bytes memory filename, address a) public {
