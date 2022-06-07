@@ -13,17 +13,45 @@ if [[ -e $OUTPUT_FILE ]]; then
 fi
 mkfifo $OUTPUT_FILE 
 
-trap 'rm $INPUT_FILE;rm $OUTPUT_FILE;kill 0' EXIT
-coproc forge script --ffi $@ 1>&2
-
-read IN <$OUTPUT_FILE
-echo -n "> "
-while IFS='$\n' read -r LINE; do
-  echo "$LINE" >$INPUT_FILE
-  read IN <$OUTPUT_FILE
-  echo $IN
-  if ! ps -p $COPROC_PID > /dev/null; then
-    break
-  fi
-  echo -n "> "
+NAME='UNSET'
+OPTIONS=()
+ARGS=()
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -n)
+      NAME=$2
+      shift
+      shift
+      ;;
+    *)
+      if [ "$NAME" = 'UNSET' ]; then 
+        OPTIONS+=($1)
+      else
+        ARGS+=($1)
+      fi
+      shift
+      ;;
+  esac
 done
+
+trap 'rm $INPUT_FILE;rm $OUTPUT_FILE;kill 0' EXIT
+coproc forge script --ffi --sender $ETH_FROM ${OPTIONS[*]} $NAME 1>&2
+
+if ps -p $COPROC_PID > /dev/null; then
+  read IN <$OUTPUT_FILE 
+
+  if [[ ${#ARGS[@]} -eq 0 ]]; then
+    echo -n "> "
+    while IFS='$\n' read -r LINE; do
+      echo "$LINE" >$INPUT_FILE
+      cat $OUTPUT_FILE
+      if ! ps -p $COPROC_PID > /dev/null; then
+        break
+      fi
+      echo -n "> "
+    done
+  else
+    echo "${ARGS[*]}" >$INPUT_FILE
+    cat $OUTPUT_FILE
+  fi
+fi
