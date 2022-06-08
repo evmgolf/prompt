@@ -1,5 +1,8 @@
 # prompt - shell scripting in solidity
 
+## Requirements
+forge, python, jq
+
 ## Installation
 `forge install https://github.com/evmgolf/prompt`
 
@@ -19,7 +22,7 @@ However, this code has not been audited, please exercise due caution.
 Additionally, by running the script with `--ffi`, third party libraries will also be able to make `ffi` calls.
 
 ## Usage
-prompt [forge arguments..] -- {ContractOrPath} [-c] [-j] [shell arguments...]
+`prompt [forge arguments..] -- {ContractOrPath} [-c] [-j] [shell arguments...]`
 
 ### Flags
 - `[shell arguments...]` - Passes arguments to the shell program to be executed immediately.
