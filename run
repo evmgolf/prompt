@@ -15,6 +15,7 @@ mkfifo $OUTPUT_FILE
 
 CONTINUE='false'
 NAME='UNSET'
+JSON='false'
 OPTIONS=()
 ARGS=()
 while [[ $# -gt 0 ]]; do
@@ -32,6 +33,14 @@ while [[ $# -gt 0 ]]; do
       fi
       shift
       ;;
+    -j)
+      if [ "$NAME" = 'UNSET' ]; then
+        OPTIONS+=($1)
+      else
+        JSON='true'
+      fi
+      shift
+      ;;
     *)
       if [ "$NAME" = 'UNSET' ]; then 
         OPTIONS+=($1)
@@ -42,6 +51,14 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+function output() {
+  if [ $JSON = 'true' ]; then
+    cat $OUTPUT_FILE | python $(dirname $0)/decode.py | jq
+  else
+    cat $OUTPUT_FILE
+  fi
+}
 
 trap 'rm $INPUT_FILE;rm $OUTPUT_FILE;kill $COPROC_PID 2>/dev/null' EXIT
 coproc forge script --ffi --sender $ETH_FROM ${OPTIONS[*]} $NAME 1>&2
@@ -56,12 +73,12 @@ if ps -p $COPROC_PID > /dev/null; then
   if [[ "$CONTINUE" = 'true' || ${#ARGS[@]} -eq 0 ]]; then
     if [[ ! ${#ARGS[@]} -eq 0 ]]; then
       echo "${ARGS[*]}" >$INPUT_FILE
-      cat $OUTPUT_FILE
+      output
     fi
     echo -n "> "
     while read -r LINE; do
       echo "$LINE" >$INPUT_FILE
-      cat $OUTPUT_FILE
+      output
       if ! ps -p $COPROC_PID > /dev/null; then
         break
       fi
@@ -69,6 +86,6 @@ if ps -p $COPROC_PID > /dev/null; then
     done
   else
     echo "${ARGS[*]}" >$INPUT_FILE
-    cat $OUTPUT_FILE
+    output
   fi
 fi
