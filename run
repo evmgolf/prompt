@@ -34,7 +34,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-trap 'rm $INPUT_FILE;rm $OUTPUT_FILE;kill 0' EXIT
+trap 'rm $INPUT_FILE;rm $OUTPUT_FILE;kill $COPROC_PID' EXIT
 coproc forge script --ffi --sender $ETH_FROM ${OPTIONS[*]} $NAME 1>&2
 
 if ps -p $COPROC_PID > /dev/null; then
