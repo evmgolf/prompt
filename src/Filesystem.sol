@@ -10,6 +10,7 @@ contract Filesystem is Test {
   using Decimal for uint;
   using Hexadecimal for address;
   using Hexadecimal for uint;
+  using Hexadecimal for bytes;
 
   uint files;
   Bash bash;
@@ -41,7 +42,7 @@ contract Filesystem is Test {
   }
 
   function write(bytes memory filename, bytes memory text) public {
-    bash.run(bytes.concat("echo -e ", text), filename);
+    bash.run(bytes.concat("echo ", text.hexadecimal(), "|xxd -r -p"), filename);
   }
 
   function write(bytes memory filename, address a) public {
