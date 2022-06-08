@@ -4,7 +4,7 @@
 `forge install https://github.com/evmgolf/prompt`
 
 ## Development
-Create a contract inheriting from `prompt/IO.io` and implement `handleInput`.
+Create a contract inheriting from `prompt/IO.sol` and implement `handleInput`.
 
 See [src/example](src/example) for example scripts.
 
