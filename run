@@ -42,7 +42,7 @@ if ps -p $COPROC_PID > /dev/null; then
 
   if [[ ${#ARGS[@]} -eq 0 ]]; then
     echo -n "> "
-    while IFS='$\n' read -r LINE; do
+    while read -r LINE; do
       echo "$LINE" >$INPUT_FILE
       cat $OUTPUT_FILE
       if ! ps -p $COPROC_PID > /dev/null; then
