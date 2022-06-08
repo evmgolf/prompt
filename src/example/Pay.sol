@@ -5,6 +5,8 @@ import {IO} from "../IO.sol";
 import {Hexadecimal} from "codec/Hexadecimal.sol";
 import {Decimal} from "codec/Decimal.sol";
 import {Tokenizer} from "codec/Tokenizer.sol";
+import {Quote} from "codec/Quote.sol";
+import {JSON} from "codec/JSON.sol";
 
 contract Pay is IO {
   using Hexadecimal for address;
@@ -12,6 +14,7 @@ contract Pay is IO {
   using Decimal for uint;
   using Decimal for bytes;
   using Tokenizer for bytes;
+  using Quote for bytes;
 
   constructor () IO() {}
 
@@ -20,13 +23,13 @@ contract Pay is IO {
 
     bytes32 words0 = keccak256(words[0]);
     if (words0 == keccak256(bytes("help"))) {
-      return bytes.concat(
-        "\"address - prints msg.sender\n",
-        "balance [address=msg.sender] - prints the balance of the address\n",
-        "pay [to] [amount]\""
-      );
+      bytes[] memory values = new bytes[](3);
+      values[0] = JSON.encode(string("address - prints msg.sender"));
+      values[1] = JSON.encode(string("balance [address=msg.sender] - prints the balance of the address"));
+      values[2] = JSON.encode(string("pay [to] [amount]"));
+      return JSON.encode(values).quote("'");
     } else if (words0 == keccak256(bytes("address"))) {
-      return msg.sender.hexadecimal();
+      return JSON.encode(msg.sender).quote("'");
     } else if (words0 == keccak256(bytes("balance"))) {
       address a;
       if (words.length == 1) {
@@ -34,7 +37,7 @@ contract Pay is IO {
       } else {
         a = words[1].decodeAddress();
       }
-      return a.balance.decimal();
+      return JSON.encode(a.balance).quote("'");
     } else if (words0 == keccak256(bytes("pay"))) {
       address payable to = payable(words[1].decodeAddress());
       uint amount = Decimal.decodeUint(words[2]);
@@ -42,6 +45,7 @@ contract Pay is IO {
     } else {
       running = false;
     }
+    return JSON.encode();
   }
 }
 
