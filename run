@@ -13,6 +13,7 @@ if [[ -e $OUTPUT_FILE ]]; then
 fi
 mkfifo $OUTPUT_FILE 
 
+CONTINUE='false'
 NAME='UNSET'
 OPTIONS=()
 ARGS=()
@@ -21,6 +22,14 @@ while [[ $# -gt 0 ]]; do
     -n)
       NAME=$2
       shift
+      shift
+      ;;
+    -c)
+      if [ "$NAME" = 'UNSET' ]; then
+        OPTIONS+=($1)
+      else
+        CONTINUE='true'
+      fi
       shift
       ;;
     *)
@@ -37,12 +46,18 @@ done
 trap 'rm $INPUT_FILE;rm $OUTPUT_FILE;kill $COPROC_PID 2>/dev/null' EXIT
 coproc forge script --ffi --sender $ETH_FROM ${OPTIONS[*]} $NAME 1>&2
 
+# This check only works if the script immediately fails
+# Does not work for build failures
 if ps -p $COPROC_PID > /dev/null; then
   # WARNING: this hangs if the script fails
   # Need to ^C to exit
   read IN <$OUTPUT_FILE 
 
-  if [[ ${#ARGS[@]} -eq 0 ]]; then
+  if [[ "$CONTINUE" = 'true' || ${#ARGS[@]} -eq 0 ]]; then
+    if [[ ! ${#ARGS[@]} -eq 0 ]]; then
+      echo "${ARGS[*]}" >$INPUT_FILE
+      cat $OUTPUT_FILE
+    fi
     echo -n "> "
     while read -r LINE; do
       echo "$LINE" >$INPUT_FILE
