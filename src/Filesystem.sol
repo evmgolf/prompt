@@ -50,11 +50,11 @@ contract Filesystem is Test {
   }
 
   function readHexadecimal(bytes memory filename) public returns (bytes memory){
-    return bash.run(bytes.concat("head -n1 ", filename), "");
+    return bash.run(bytes.concat("head -n1 ", filename));
   }
 
   function readLine(bytes memory filename) public returns (bytes memory){
-    return bash.run(bytes.concat("head -n1 ", filename, "|cast --from-utf8"), "");
+    return bash.run(bytes.concat("head -n1 ", filename, "|cast --from-utf8"));
   }
 
   function readAddress(bytes memory filename) public returns (address) {
@@ -64,8 +64,7 @@ contract Filesystem is Test {
           "cast --concat-hex 0x000000000000000000000000 $(head -n1 ",
           filename,
           ")"
-        ),
-        ""
+        )
       ),
       (address)
     );
