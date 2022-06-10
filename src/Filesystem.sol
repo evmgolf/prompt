@@ -41,6 +41,10 @@ contract Filesystem is Test {
     bash.run(bytes.concat("mkfifo ", filename));
   }
 
+  function createTemp() public returns (bytes memory) {
+    return bash.run("mktemp|cast --from-utf8");
+  }
+
   function write(bytes memory filename, bytes memory text) public {
     bash.run(bytes.concat("echo ", text.hexadecimal(), "|xxd -r -p"), filename);
   }
