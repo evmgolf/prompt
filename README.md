@@ -1,5 +1,7 @@
 # prompt - shell scripting in solidity
 
+[![foundry-test](https://github.com/evmgolf/prompt/actions/workflows/main.yml/badge.svg)](https://github.com/evmgolf/prompt/actions/workflows/main.yml)
+
 ## Requirements
 forge, python, jq
 
